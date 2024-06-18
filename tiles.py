@@ -16,3 +16,4 @@ class Tile():
         self.center_point = Point(((x2+x1)/2), ((y2+y1)/2))
         self.base_value = base_value
         self.answer_value = answer_value
+        self.focus = False
