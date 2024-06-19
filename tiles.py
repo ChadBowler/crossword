@@ -16,4 +16,12 @@ class Tile():
         self.center_point = Point(((x2+x1)/2), ((y2+y1)/2))
         self.base_value = base_value
         self.answer_value = answer_value
+        self.input = ""
         self.focus = False
+        self.blank = False
+        self.locked = False
+
+    # def _fill_tile(self, value):
+    #     if self.focus:
+    #         if not self.locked:
+    #             self.input = value
