@@ -3,32 +3,50 @@ import pygame
 from crossword_data import generate_new_puzzle
 from puzzle_board import structure_puzzle
 
+screen_width = 1920
+screen_height = 1080
 # pygame setup
 pygame.init()
 flags = pygame.SCALED
-screen = pygame.display.set_mode((1920, 1080), flags)
+screen = pygame.display.set_mode((screen_width, screen_height), flags)
 pygame.display.set_caption('Crossword Game')
 clock = pygame.time.Clock()
 running = True
 
+margin = 50
+tile_size = 50
 light_blue = (0,150,255)
 light_gray = (166, 166, 166)
 dark_gray = (52, 56, 64)
+clues_size = 22
 number_font = pygame.font.Font(None, 24)
 type_font = pygame.font.Font(None, 36)
+clues_font = pygame.font.Font(None, clues_size)
+header_font = pygame.font.Font(None, 40)
 
 def new_puzzle():
+    # gen_puzzle is the Data class
     gen_puzzle = generate_new_puzzle()
-    puzzle = structure_puzzle(gen_puzzle)
+    # puzzle is the Puzzle class
+    puzzle = structure_puzzle(gen_puzzle, margin, margin*2, tile_size)
     board_height = puzzle._rows * puzzle._tile_size_y
     board_width = puzzle._cols * puzzle._tile_size_x
+    # board is the surface where the gameboard is drawn
     board = pygame.Surface.subsurface(screen, ((puzzle._x1, puzzle._y1), (board_width, board_height)))
-    return board, puzzle
+    clues_section = pygame.Surface.subsurface(screen, ((screen_width - board_width - margin, puzzle._y1), (board_width, screen_height - puzzle._y1 - margin)))
+    return board, puzzle, gen_puzzle, clues_section
 
-# def set_focus():
-#     if not tile.blank:
-#         tile.focus = True
-#     draw_square("focus")
+def display_clues():
+    down_clues_header = header_font.render("Down:", True, "white")
+    clues_section.blit(down_clues_header, (5, 0))
+    for i in range(len(gen_puzzle.down_clues)):
+        clue_text = clues_font.render(gen_puzzle.down_clues[i], True, "white")
+        clues_section.blit(clue_text, (5, 40 + i*clues_size))
+    across_clues_header = header_font.render("Across:", True, "white")
+    clues_section.blit(across_clues_header, (400, 0))
+    for i in range(len(gen_puzzle.across_clues)):
+        clue_text = clues_font.render(gen_puzzle.across_clues[i], True, "white")
+        clues_section.blit(clue_text, (400, 40 + i*clues_size))
 
 def clear_focus():
     for row in puzzle._tiles:
@@ -44,7 +62,9 @@ def draw_grid(tile):
 
 
 def handle_keyboard_input():
+    # next_focus boolean to handle looping logic when changing focus
     next_focus = False
+    # alpha characters
     if event.key >= 97 and event.key <= 122:
         for row in puzzle._tiles:
             for tile in row:
@@ -57,14 +77,15 @@ def handle_keyboard_input():
                     if not tile.locked:
                         tile.input = event.unicode.upper()
                         clear_focus()
-                        next_focus = True                        
+                        next_focus = True 
+    # backspace (8) and delete (127) keys
     elif event.key == 8 or event.key == 127:
         for row in puzzle._tiles:
-            for tile in row:
-                
+            for tile in row: 
                 if tile.focus:
                     if not tile.locked:
                         tile.input = ""
+    # arrow keys
     elif event.key == pygame.K_LEFT:
         for i in range(len(puzzle._tiles)-1, -1, -1):
             for j in range(len(puzzle._tiles[i])-1, -1, -1):
@@ -123,11 +144,6 @@ def handle_keyboard_input():
                             puzzle._tiles[i][j].focus = True
                             next_focus = False
                             return
-                        
-                        
-                    
-            # print("left")
-        # print(event)
 
 def draw_square(square_type):
     if square_type == "focus":
@@ -140,9 +156,9 @@ def draw_square(square_type):
     board.blit(text, (tile.center_point.x - puzzle._x1 - 5, tile.center_point.y - puzzle._y1 - 5))
 
 try:
-    board, puzzle = new_puzzle()    
+    board, puzzle, gen_puzzle, clues_section = new_puzzle()    
 except ValueError:
-    board, puzzle = new_puzzle()
+    board, puzzle, gen_puzzle, clues_section = new_puzzle()
 
 while running:
     # poll for events
@@ -152,13 +168,15 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        # Get user input for squares
         if event.type == pygame.KEYDOWN:
             handle_keyboard_input()
 
     # fill the screen with a color to wipe away anything from last frame
     screen.fill("black")
     board.fill("white")
-
+    # clues_section.fill("white")
+    # Set up individual tiles on the screen
     tiles = []
     for row in puzzle._tiles:
         for tile in row:
@@ -189,21 +207,9 @@ while running:
                     tile.focus = True
             if tile.focus:
                 draw_square("focus")
-            # Get user input for squares
-    
-        # if event.key == pygame.K_0:
-        #     print("Hey, you pressed the key, '0'!")
-        # if event.key == pygame.K_1:
-        #     print("Doing whatever")
-    # # if event.type==pygame.KEYDOWN:
-    # if pygame.key.get_pressed()[pygame.K_SPACE]:
-    # # type_text = pygame.event.event_name(event.type)
-    # # typed = type_font.render(type_text, True, (0, 0, 0))
-    #     print("I pressed space bar")
-    # else:
-    #     print("What did I press?")
-        # board.blit(typed, (tile.center_point.x - puzzle._x1 - 5, tile.center_point.y - puzzle._y1 - 5))
-
+            
+    # Render clues text
+    display_clues()
 
     # clear focus if mouse is pressed outside the game board
     if (event.type==pygame.MOUSEBUTTONDOWN and 

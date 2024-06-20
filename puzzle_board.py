@@ -28,7 +28,7 @@ class Puzzle():
                 k += 1
             self._tiles.append(row)
 
-def structure_puzzle(puzzle):
-    new_puzzle = Puzzle(150, 150, puzzle, 50, 50)
+def structure_puzzle(puzzle, x1, y1, tile_size):
+    new_puzzle = Puzzle( x1, y1, puzzle, tile_size, tile_size)
     new_puzzle._create_tiles()
     return new_puzzle
