@@ -1,0 +1,58 @@
+{
+    "game_settings": {
+        "board_size": "default"
+    },
+    "appearance": {
+        "themes": {
+            "light": {
+                "colors": {
+                    "bg_color": "#ffffff",
+                    "board_color": "#ffffff",
+                    "text_color": "#000000",
+                    "grid_color": "#000000",
+                    "block_highlight": "#FFED01",
+                    "focus_highlight": "#A6A6A6",
+                    "blank_blocks": "#000000"
+                    
+                },
+                "font": {
+                    "font": "Times New Roman",
+                    "size": 12
+                },
+                "default": "True"
+            },
+            "dark": {
+                "colors": {
+                    "bg_color": "#000000",
+                    "board_color": "#000000",
+                    "text_color": "#ffffff",
+                    "grid_color": "#0096FF",
+                    "block_highlight": "#FF0D04",
+                    "focus_highlight": "#343840",
+                    "blank_blocks": "#A6A6A6"
+                    
+                },
+                "font": {
+                    "font": "Times New Roman",
+                    "size": 12
+                }
+            },
+            "rainbow": {
+                "colors": {
+                    "bg_color": "#0001FF",
+                    "board_color": "#ffffff",
+                    "text_color": "#FFDD1A",
+                    "grid_color": "#9244FC",
+                    "block_highlight": "#1DFF02",
+                    "focus_highlight": "#FFED01",
+                    "blank_blocks": "#FF0D04"
+                    
+                },
+                "font": {
+                    "font": "Times New Roman",
+                    "size": 12
+                }
+            }
+        }
+    }
+}

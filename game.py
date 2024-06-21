@@ -1,23 +1,27 @@
 # Example file showing a basic pygame "game loop"
 import pygame
+from settings.settings import Settings
 from crossword_data import generate_new_puzzle
 from puzzle_board import structure_puzzle
 
-screen_width = 1920
-screen_height = 1080
+
 # pygame setup
 pygame.init()
+
+settings = Settings("dark")
+# print(settings)
+screen_height = settings.screen_height
+screen_width = settings.screen_width
 flags = pygame.SCALED
 screen = pygame.display.set_mode((screen_width, screen_height), flags)
 pygame.display.set_caption('Crossword Game')
 clock = pygame.time.Clock()
 running = True
 
+# print(pygame.font.get_default_font())
+
 margin = 50
 tile_size = 50
-light_blue = (0,150,255)
-light_gray = (166, 166, 166)
-dark_gray = (52, 56, 64)
 clues_size = 22
 number_font = pygame.font.Font(None, 24)
 type_font = pygame.font.Font(None, 36)
@@ -33,7 +37,7 @@ def new_puzzle():
     board_width = puzzle._cols * puzzle._tile_size_x
     # board is the surface where the gameboard is drawn
     board = pygame.Surface.subsurface(screen, ((puzzle._x1, puzzle._y1), (board_width, board_height)))
-    clues_section = pygame.Surface.subsurface(screen, ((screen_width - board_width - margin, puzzle._y1), (board_width, screen_height - puzzle._y1 - margin)))
+    clues_section = pygame.Surface.subsurface(screen, ((screen_width - board_width - margin*2, puzzle._y1), (board_width, screen_height - puzzle._y1)))
     return board, puzzle, gen_puzzle, clues_section
 
 
@@ -44,16 +48,16 @@ except ValueError:
 
 
 def display_clues():
-    down_clues_header = header_font.render("Down:", True, "white")
-    clues_section.blit(down_clues_header, (5, 0))
+    down_clues_header = header_font.render("Down:", True, settings.text_color)
+    clues_section.blit(down_clues_header, (margin / 2, 0))
     for i in range(len(gen_puzzle.down_clues)):
-        clue_text = clues_font.render(gen_puzzle.down_clues[i], True, "white")
-        clues_section.blit(clue_text, (5, 40 + i*clues_size))
-    across_clues_header = header_font.render("Across:", True, "white")
-    clues_section.blit(across_clues_header, (400, 0))
+        clue_text = clues_font.render(gen_puzzle.down_clues[i], True, settings.text_color)
+        clues_section.blit(clue_text, (margin / 2, 40 + i*clues_size))
+    across_clues_header = header_font.render("Across:", True, settings.text_color)
+    clues_section.blit(across_clues_header, (clues_section.get_width()/2 + margin*2, 0))
     for i in range(len(gen_puzzle.across_clues)):
-        clue_text = clues_font.render(gen_puzzle.across_clues[i], True, "white")
-        clues_section.blit(clue_text, (400, 40 + i*clues_size))
+        clue_text = clues_font.render(gen_puzzle.across_clues[i], True, settings.text_color)
+        clues_section.blit(clue_text, (clues_section.get_width()/2 + margin*2, 40 + i*clues_size))
 
 def clear_focus():
     for row in puzzle._tiles:
@@ -61,30 +65,30 @@ def clear_focus():
             tile.focus = False
 
 def draw_grid(tile):
-    pygame.draw.line(screen, light_blue, (tile.tl_corner.x, tile.tl_corner.y), (tile.bl_corner.x, tile.bl_corner.y), width=3)
-    pygame.draw.line(screen, light_blue, (tile.tl_corner.x, tile.tl_corner.y), (tile.tr_corner.x, tile.tr_corner.y), width=3)
-    pygame.draw.line(screen, light_blue, (tile.tr_corner.x, tile.tr_corner.y), (tile.br_corner.x, tile.br_corner.y), width=3)
-    pygame.draw.line(screen, light_blue, (tile.br_corner.x, tile.br_corner.y), (tile.bl_corner.x, tile.bl_corner.y), width=3)
+    pygame.draw.line(screen, settings.grid_color, (tile.tl_corner.x, tile.tl_corner.y), (tile.bl_corner.x, tile.bl_corner.y), width=3)
+    pygame.draw.line(screen, settings.grid_color, (tile.tl_corner.x, tile.tl_corner.y), (tile.tr_corner.x, tile.tr_corner.y), width=3)
+    pygame.draw.line(screen, settings.grid_color, (tile.tr_corner.x, tile.tr_corner.y), (tile.br_corner.x, tile.br_corner.y), width=3)
+    pygame.draw.line(screen, settings.grid_color, (tile.br_corner.x, tile.br_corner.y), (tile.bl_corner.x, tile.bl_corner.y), width=3)
 
 def draw_square(square_type):
     if square_type == "focus":
-        square_color = light_gray
+        square_color = settings.focus_highlight
     if square_type == "blank":
-        square_color = dark_gray
+        square_color = settings.blank_blocks
     square = pygame.draw.rect(board, square_color, [tile.tl_corner.x - puzzle._x1 + 2, tile.tl_corner.y - puzzle._y1 + 2, puzzle._tile_size_x - 3, puzzle._tile_size_y - 3])
     if tile.base_value != 0:
         board.blit(number, (tile.tl_corner.x - puzzle._x1 + 3, tile.tl_corner.y - puzzle._y1 + 3))
     board.blit(text, (tile.center_point.x - puzzle._x1 - 5, tile.center_point.y - puzzle._y1 - 5))
 
 
-def draw_across_highlight(array):
+def draw_across_highlight(array, color, width=4):
     if array:
-        pygame.draw.lines(board, "red", True, [(array[0].tl_corner.x - margin, array[0].tl_corner.y - margin*2), (array[-1].tr_corner.x - margin, array[-1].tr_corner.y - margin*2), (array[-1].br_corner.x - margin, array[-1].br_corner.y - margin*2), (array[0].bl_corner.x - margin, array[0].bl_corner.y - margin*2)], width=4)
+        pygame.draw.lines(board, color, True, [(array[0].tl_corner.x - margin, array[0].tl_corner.y - margin*2), (array[-1].tr_corner.x - margin, array[-1].tr_corner.y - margin*2), (array[-1].br_corner.x - margin, array[-1].br_corner.y - margin*2), (array[0].bl_corner.x - margin, array[0].bl_corner.y - margin*2)], width)
     else:
         return
-def draw_down_highlight(array):
+def draw_down_highlight(array, color, width=4):
     if array:
-        pygame.draw.lines(board, "red", True, [(array[0].tl_corner.x - margin, array[0].tl_corner.y - margin*2), (array[0].tr_corner.x - margin, array[0].tr_corner.y - margin*2), (array[-1].br_corner.x - margin, array[-1].br_corner.y - margin*2), (array[-1].bl_corner.x - margin, array[-1].bl_corner.y - margin*2)], width=4)
+        pygame.draw.lines(board, color, True, [(array[0].tl_corner.x - margin, array[0].tl_corner.y - margin*2), (array[0].tr_corner.x - margin, array[0].tr_corner.y - margin*2), (array[-1].br_corner.x - margin, array[-1].br_corner.y - margin*2), (array[-1].bl_corner.x - margin, array[-1].bl_corner.y - margin*2)], width)
     else:
         return
 
@@ -97,6 +101,8 @@ def check_across_answers():
     if gen_puzzle.across_answer_dict[str(key_check)] == across_word:
         for tile in across_word_array:
             tile.locked = True
+        # draw_across_highlight(across_word_array, "yellow", 5)
+        
 
 def check_down_answers():
     down_word_array = puzzle._find_word_down()
@@ -107,6 +113,8 @@ def check_down_answers():
     if gen_puzzle.down_answer_dict[str(key_check)] == down_word:
         for tile in down_word_array:
             tile.locked = True
+        # draw_down_highlight(down_word_array, "yellow", width=5)
+        
 
 def change_direction():
     if puzzle.across:
@@ -130,7 +138,6 @@ def handle_keyboard_input():
                     if tile.focus:
                         if not tile.locked:
                             tile.input = event.unicode.upper()
-                            # TODO: check answers for both down and across words of the focus tile
                             check_across_answers()
                             check_down_answers()
                             clear_focus()
@@ -247,8 +254,8 @@ while running:
             handle_keyboard_input()
 
     # fill the screen with a color to wipe away anything from last frame
-    screen.fill("black")
-    board.fill("white")
+    screen.fill(settings.bg_color)
+    board.fill(settings.board_color)
     # clues_section.fill("white")
     # Set up individual tiles on the screen
     tiles = []
@@ -261,8 +268,8 @@ while running:
             # set tile background as a subsurface of board
             tile_bg = board.subsurface([tile.tl_corner.x - puzzle._x1, tile.tl_corner.y - puzzle._y1, puzzle._tile_size_x, puzzle._tile_size_y])
             # Set up the values that will be rendered in each square
-            number = number_font.render(str(tile.base_value), True, (0, 0, 0))
-            text = type_font.render(str(tile.input), True, (0, 0, 0))
+            number = number_font.render(str(tile.base_value), True, settings.text_color)
+            text = type_font.render(str(tile.input), True, settings.text_color)
             # Set up blank tiles
             if tile.answer_value == ".":
                 tile.blank = True
@@ -285,13 +292,11 @@ while running:
             
     # Render clues text
     display_clues()
+    # highlight current word
     if puzzle.across:
-        draw_across_highlight(array=puzzle._find_word_across())
+        draw_across_highlight(array=puzzle._find_word_across(), color=settings.block_highlight)
     else:
-        draw_down_highlight(array=puzzle._find_word_down())
-    
-    # highlight_direction("across")
-
+        draw_down_highlight(array=puzzle._find_word_down(), color=settings.block_highlight)
 
     # clear focus if mouse is pressed outside the game board
     if (event.type==pygame.MOUSEBUTTONDOWN and 

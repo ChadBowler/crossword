@@ -63,7 +63,7 @@ class Data():
 
 
 def fetch_data(retries):
-    random.seed(0)
+    # random.seed(0)
     while True:
         retries -= 1
         year = str(random.randint(1988, 2018))
