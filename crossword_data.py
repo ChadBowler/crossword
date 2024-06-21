@@ -2,100 +2,164 @@ import requests as rq
 import random
 
 class Data():
-    def __init__(self, json_data):
-        self.json_data = json_data
-        self.across_clues = []
-        self.down_clues = []
-        self.across_answers = []
-        self.down_answers = []
-        self.across_answer_dict = {}
-        self.down_answer_dict = {}
-        self.cols = 0
-        self.rows = 0
-        self.gridnums = []
-        self.grid = []
-        self.author = ""
-        self.editor = ""
-        self.copyright = ""
-        self.date = ""
-        self.publisher = ""
-        self.title = ""
+    def __init__(self):
+        self.json_data = self.fetch_data(5)
+        self.across_clues = self.json_data
+        self.down_clues = self.json_data
+        self.across_answers = self.json_data
+        self.down_answers = self.json_data
+        self.across_answer_dict = self.craft_across_ans_dict()
+        self.down_answer_dict = self.craft_down_ans_dict()
+        self.cols = self.json_data
+        self.rows = self.json_data
+        self.gridnums = self.json_data
+        self.grid = self.json_data
+        self.author = self.json_data
+        self.editor = self.json_data
+        self._cpyright = self.json_data
+        self.date = self.json_data
+        self.publisher = self.json_data
+        self.title = self.json_data
 
-    def get_clues(self):
-        clues = self.json_data.json()["clues"]
-        self.across_clues = clues["across"]
-        self.down_clues = clues["down"]
-        
+    @property
+    def across_clues(self):
+        return self._across_clues    
+    @across_clues.setter
+    def across_clues(self, json_data):
+        clues = json_data.json()["clues"]
+        self._across_clues = clues["across"]
+          
+    @property
+    def down_clues(self):
+        return self._down_clues    
+    @down_clues.setter
+    def down_clues(self, json_data):
+        clues = json_data.json()["clues"]
+        self._down_clues = clues["down"]
 
-    def get_answers(self):
-        answers = self.json_data.json()["answers"]
-        self.across_answers = answers["across"]
-        self.down_answers = answers["down"]
-        
+    @property
+    def across_answers(self):
+        return self._across_answers    
+    @across_answers.setter
+    def across_answers(self, json_data):
+        answers = json_data.json()["answers"]
+        self._across_answers = answers["across"]
 
-    def get_puzzle_info(self):
-        self.author = self.json_data.json()["author"]
-        self.editor = self.json_data.json()["editor"]
-        self.copyright = self.json_data.json()["copyright"]
-        self.date = self.json_data.json()["date"]
-        self.publisher = self.json_data.json()["publisher"]
-        self.title = self.json_data.json()["title"]
+    @property
+    def down_answers(self):
+        return self._down_answers    
+    @down_answers.setter
+    def down_answers(self, json_data):
+        answers = json_data.json()["answers"]
+        self._down_answers = answers["down"]
 
-    def get_size(self):
-        size = self.json_data.json()["size"]
-        self.cols = size["cols"]
-        self.rows = size["rows"]
+    @property
+    def cols(self):
+        return self._cols    
+    @cols.setter
+    def cols(self, json_data):
+        size = json_data.json()["size"]
+        self._cols = size["cols"]
 
-    def get_grids(self):
-        self.gridnums = self.json_data.json()["gridnums"]
-        self.grid = self.json_data.json()["grid"]
+    @property
+    def rows(self):
+        return self._rows    
+    @rows.setter
+    def rows(self, json_data):
+        size = json_data.json()["size"]
+        self._rows = size["rows"]
 
-    def craft_ans_dict(self):
+    @property
+    def gridnums(self):
+        return self._gridnums    
+    @gridnums.setter
+    def gridnums(self, json_data):
+        self._gridnums = json_data.json()["gridnums"]
+
+    @property
+    def grid(self):
+        return self._grid    
+    @grid.setter
+    def grid(self, json_data):
+        self._grid = json_data.json()["grid"]
+    
+    @property
+    def author(self):
+        return self._author    
+    @author.setter
+    def author(self, json_data):
+        self._author = json_data.json()["author"]
+
+    @property
+    def editor(self):
+        return self._editor    
+    @editor.setter
+    def editor(self, json_data):
+        self._editor = json_data.json()["editor"]
+
+    @property
+    def _cpyright(self):
+        return self.__cpyright    
+    @_cpyright.setter
+    def _cpyright(self, json_data):
+        self.__cpyright = json_data.json()["copyright"]
+
+    @property
+    def date(self):
+        return self._date    
+    @date.setter
+    def date(self, json_data):
+        self._date = json_data.json()["date"]
+
+    @property
+    def publisher(self):
+        return self._publisher    
+    @publisher.setter
+    def publisher(self, json_data):
+        self._publisher = json_data.json()["publisher"]
+
+    @property
+    def title(self):
+        return self._title    
+    @title.setter
+    def title(self, json_data):
+        self._title = json_data.json()["title"]
+
+    def craft_across_ans_dict(self):
+        across_answer_dict = {}
         for i in range(len(self.across_clues)):
             clue_key = self.across_clues[i].split(".")[0]
-            self.across_answer_dict[clue_key] = self.across_answers[i]
+            across_answer_dict[clue_key] = self.across_answers[i]
+        return across_answer_dict
 
+    def craft_down_ans_dict(self):
+        down_answer_dict = {}
         for i in range(len(self.down_clues)):
             clue_key = self.down_clues[i].split(".")[0]
-            self.down_answer_dict[clue_key] = self.down_answers[i]
+            down_answer_dict[clue_key] = self.down_answers[i]
+        return down_answer_dict
         
-            
+    def fetch_data(self, retries):
+        random.seed(0)
+        while True:
+            retries -= 1
+            year = str(random.randint(1988, 2018))
+            month = random.randint(1, 12)
+            if month < 10:
+                month = "0" + str(month)
+            else:
+                month = str(month)
+            day = random.randint(1, 31)
+            if day < 10:
+                day = "0" + str(day)
+            else:
+                day = str(day)
+            xword_data = rq.get(f'https://raw.githubusercontent.com/doshea/nyt_crosswords/master/{year}/{month}/{day}.json')
 
-
-def fetch_data(retries):
-    # random.seed(0)
-    while True:
-        retries -= 1
-        year = str(random.randint(1988, 2018))
-        month = random.randint(1, 12)
-        if month < 10:
-            month = "0" + str(month)
-        else:
-            month = str(month)
-        day = random.randint(1, 31)
-        if day < 10:
-            day = "0" + str(day)
-        else:
-            day = str(day)
-        xword_data = rq.get(f'https://raw.githubusercontent.com/doshea/nyt_crosswords/master/{year}/{month}/{day}.json')
-
-        if xword_data.status_code != 200:
-            if retries < 1:
-                return f"Error fetching data: {xword_data.status_code}"
-            continue
-        else:
-            return xword_data
-    
-
-def generate_new_puzzle():
-    new_puzzle = Data(fetch_data(5))
-    if new_puzzle:
-        new_puzzle.get_clues()
-        new_puzzle.get_answers()
-        new_puzzle.get_size()
-        new_puzzle.get_grids()
-        new_puzzle.get_puzzle_info()
-        new_puzzle.craft_ans_dict()
-        return new_puzzle
-    else:
-        raise Exception("Puzzle failed to generate.")
+            if xword_data.status_code != 200:
+                if retries < 1:
+                    return f"Error fetching data: {xword_data.status_code}"
+                continue
+            else:
+                return xword_data
+  
