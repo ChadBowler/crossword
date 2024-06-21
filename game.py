@@ -77,9 +77,14 @@ def draw_square(square_type):
     board.blit(text, (tile.center_point.x - puzzle._x1 - 5, tile.center_point.y - puzzle._y1 - 5))
 
 
-def draw_highlight(array):
+def draw_across_highlight(array):
     if array:
         pygame.draw.lines(board, "red", True, [(array[0].tl_corner.x - margin, array[0].tl_corner.y - margin*2), (array[-1].tr_corner.x - margin, array[-1].tr_corner.y - margin*2), (array[-1].br_corner.x - margin, array[-1].br_corner.y - margin*2), (array[0].bl_corner.x - margin, array[0].bl_corner.y - margin*2)], width=4)
+    else:
+        return
+def draw_down_highlight(array):
+    if array:
+        pygame.draw.lines(board, "red", True, [(array[0].tl_corner.x - margin, array[0].tl_corner.y - margin*2), (array[0].tr_corner.x - margin, array[0].tr_corner.y - margin*2), (array[-1].br_corner.x - margin, array[-1].br_corner.y - margin*2), (array[-1].bl_corner.x - margin, array[-1].bl_corner.y - margin*2)], width=4)
     else:
         return
 
@@ -92,27 +97,60 @@ def check_across_answers():
     if gen_puzzle.across_answer_dict[str(key_check)] == across_word:
         for tile in across_word_array:
             tile.locked = True
-    
+
+def check_down_answers():
+    down_word_array = puzzle._find_word_down()
+    key_check = down_word_array[0].base_value
+    down_word = ""
+    for tile in down_word_array:
+        down_word += tile.input
+    if gen_puzzle.down_answer_dict[str(key_check)] == down_word:
+        for tile in down_word_array:
+            tile.locked = True
+
+def change_direction():
+    if puzzle.across:
+        puzzle.across = False
+    else:
+        puzzle.across = True
 
 def handle_keyboard_input():
     # next_focus boolean to handle looping logic when changing focus
     next_focus = False
     # alpha characters
     if event.key >= 97 and event.key <= 122:
-        for row in puzzle._tiles:
-            for tile in row:
-                if next_focus:
-                    if not tile.blank:
-                        tile.focus = True
-                        next_focus = False
-                        continue
-                if tile.focus:
-                    if not tile.locked:
-                        tile.input = event.unicode.upper()
-                        # TODO: check answers for both down and across words of the focus tile
-                        check_across_answers()
-                        clear_focus()
-                        next_focus = True 
+        if puzzle.across:
+            for row in puzzle._tiles:
+                for tile in row:
+                    if next_focus:
+                        if not tile.blank:
+                            tile.focus = True
+                            next_focus = False
+                            continue
+                    if tile.focus:
+                        if not tile.locked:
+                            tile.input = event.unicode.upper()
+                            # TODO: check answers for both down and across words of the focus tile
+                            check_across_answers()
+                            check_down_answers()
+                            clear_focus()
+                            next_focus = True
+        else:
+            for i in range(puzzle._cols):
+                for j in range(puzzle._rows):
+                    tile = puzzle._tiles[j][i]
+                    if next_focus:
+                        if not tile.blank:
+                            tile.focus = True
+                            next_focus = False
+                            continue
+                    if tile.focus:
+                        if not tile.locked:
+                            tile.input = event.unicode.upper()
+                            check_down_answers()
+                            check_across_answers()
+                            clear_focus()
+                            next_focus = True
     # backspace (8) and delete (127) keys
     elif event.key == 8 or event.key == 127:
         for row in puzzle._tiles:
@@ -179,7 +217,10 @@ def handle_keyboard_input():
                             puzzle._tiles[i][j].focus = True
                             next_focus = False
                             return
-                        
+    elif event.key == pygame.K_TAB:
+        change_direction()
+       
+
     else:
         print(event.key)
 
@@ -244,7 +285,10 @@ while running:
             
     # Render clues text
     display_clues()
-    draw_highlight(array=puzzle._find_word_across())
+    if puzzle.across:
+        draw_across_highlight(array=puzzle._find_word_across())
+    else:
+        draw_down_highlight(array=puzzle._find_word_down())
     
     # highlight_direction("across")
 

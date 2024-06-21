@@ -12,6 +12,7 @@ class Puzzle():
         self._tile_size_y = tile_size_y
         self._tile_base = puzzle.gridnums
         self._tile_answers = puzzle.grid
+        self.across = True
         
 
     def _create_tiles(self):
@@ -60,31 +61,45 @@ class Puzzle():
                         current_word = ""
         return down_answers, across_answers
     
-    def _find_word_across(self):
-        def _find_focus(array):
+    def _find_focus(self, array):
             for tile in array:
                 if tile.focus:
                     return True
             return False
-        
+
+    def _find_word_across(self):
         for i in range(len(self._tiles)):
             word_array = []
             for j in range(len(self._tiles[i])):
-                
                 if self._tiles[i][j].answer_value == ".":
-                    if _find_focus(word_array):
+                    if self._find_focus(word_array):
                         return word_array
                     else:
                         word_array = []
                 else:
                     word_array.append(self._tiles[i][j])
                 if j == len(self._tiles[i]) - 1:
-                    if _find_focus(word_array):
+                    if self._find_focus(word_array):
                         return word_array
                     else:
                         word_array = []
                 
-
+    def _find_word_down(self):
+        for i in range(self._cols):
+            word_array = []
+            for j in range(self._rows):
+                if self._tiles[j][i].answer_value == ".":
+                    if self._find_focus(word_array):
+                        return word_array
+                    else:
+                        word_array = []    
+                else:
+                    word_array.append(self._tiles[j][i])
+                if j == self._rows - 1:
+                    if self._find_focus(word_array):
+                        return word_array
+                    else:
+                        word_array = [] 
 
 
 
