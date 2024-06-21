@@ -8,6 +8,8 @@ class Data():
         self.down_clues = []
         self.across_answers = []
         self.down_answers = []
+        self.across_answer_dict = {}
+        self.down_answer_dict = {}
         self.cols = 0
         self.rows = 0
         self.gridnums = []
@@ -48,11 +50,20 @@ class Data():
         self.gridnums = self.json_data.json()["gridnums"]
         self.grid = self.json_data.json()["grid"]
 
-    
+    def craft_ans_dict(self):
+        for i in range(len(self.across_clues)):
+            clue_key = self.across_clues[i].split(".")[0]
+            self.across_answer_dict[clue_key] = self.across_answers[i]
+
+        for i in range(len(self.down_clues)):
+            clue_key = self.down_clues[i].split(".")[0]
+            self.down_answer_dict[clue_key] = self.down_answers[i]
+        
+            
 
 
 def fetch_data(retries):
-    # random.seed(0)
+    random.seed(0)
     while True:
         retries -= 1
         year = str(random.randint(1988, 2018))
@@ -84,6 +95,7 @@ def generate_new_puzzle():
         new_puzzle.get_size()
         new_puzzle.get_grids()
         new_puzzle.get_puzzle_info()
+        new_puzzle.craft_ans_dict()
         return new_puzzle
     else:
         raise Exception("Puzzle failed to generate.")
