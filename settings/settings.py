@@ -5,6 +5,7 @@ import math
 pygame.init()
 
 class Settings():
+    # use theme to get variables from settings file, and data after pulling data from API
     def __init__(self, theme, data) -> None:
         # dimensions
         self.screen_height = pygame.display.Info().current_h * .9
@@ -106,8 +107,4 @@ class Settings():
 
     def __repr__(self) -> str:
         return f"Screen height: {self.screen_height} Screen width: {self.screen_width}"
-    
 
-# settings = Settings("light")
-# print(settings.bg_color)
-# print(settings.text_color)

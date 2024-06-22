@@ -15,7 +15,7 @@ def handle_keyboard_input(event, puzzle):
             for row in puzzle._tiles:
                 for tile in row:
                     if next_focus:
-                        if not tile.blank:
+                        if not tile.blank and not tile.locked:
                             tile.focus = True
                             next_focus = False
                             continue
@@ -24,6 +24,9 @@ def handle_keyboard_input(event, puzzle):
                             tile.input = event.unicode.upper()
                             puzzle.check_across_answers()
                             puzzle.check_down_answers()
+                            puzzle.clear_focus()
+                            next_focus = True
+                        else:
                             puzzle.clear_focus()
                             next_focus = True
         else:
@@ -31,7 +34,7 @@ def handle_keyboard_input(event, puzzle):
                 for j in range(puzzle._rows):
                     tile = puzzle._tiles[j][i]
                     if next_focus:
-                        if not tile.blank:
+                        if not tile.blank and not tile.locked:
                             tile.focus = True
                             next_focus = False
                             continue
@@ -42,13 +45,59 @@ def handle_keyboard_input(event, puzzle):
                             puzzle.check_across_answers()
                             puzzle.clear_focus()
                             next_focus = True
+                        else:
+                            puzzle.clear_focus()
+                            next_focus = True
     # backspace (8) and delete (127) keys
-    elif event.key == 8 or event.key == 127:
+    elif event.key == 127:
         for row in puzzle._tiles:
             for tile in row: 
                 if tile.focus:
                     if not tile.locked:
                         tile.input = ""
+    elif event.key == 8:
+        for i in range(len(puzzle._tiles)):
+            for j in range(len(puzzle._tiles[i])):
+                tile = puzzle._tiles[i][j]
+                if tile.focus:
+                    if not tile.locked:
+                        tile.input = ""
+                    puzzle.clear_focus()
+                    if puzzle.across:
+                        current_tile = tile
+                        a = i
+                        b = j
+                        while True:
+                            if b > 0:
+                                    b -= 1
+                                    current_tile = puzzle._tiles[a][b]
+                            else:
+                                if a > 0:
+                                    a -= 1
+                                    b = len(puzzle._tiles[i]) - 1
+                                    current_tile = puzzle._tiles[a][b]
+                                else:
+                                    a = len(puzzle._tiles) - 1
+                                    b = len(puzzle._tiles[i]) - 1
+                                    current_tile = puzzle._tiles[a][b]
+                            if not current_tile.blank:
+                                current_tile.focus = True
+                                return
+                    else:
+                        current_tile = tile
+                        a = i
+                        b = j
+                        while True:
+                            if a > 0:
+                                    a -= 1
+                                    current_tile = puzzle._tiles[a][b]
+                            else:
+                                    a = len(puzzle._tiles) - 1
+                                    current_tile = puzzle._tiles[a][b]
+                            if not current_tile.blank:
+                                current_tile.focus = True
+                                return
+                        
     # arrow keys
     elif event.key == pygame.K_LEFT:
         for i in range(len(puzzle._tiles)-1, -1, -1):
@@ -110,7 +159,3 @@ def handle_keyboard_input(event, puzzle):
                             return
     elif event.key == pygame.K_TAB:
         change_direction(puzzle)
-       
-
-    else:
-        print(event.key)

@@ -70,7 +70,7 @@ class Puzzle():
                         return word_array
                     else:
                         word_array = [] 
-                        
+    # cross check user input against answers dictionaries after a word is filled on the board                    
     def check_across_answers(self):
         across_word_array = self._find_word_across()
         key_check = across_word_array[0].base_value

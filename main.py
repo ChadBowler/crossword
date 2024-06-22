@@ -1,7 +1,8 @@
 from crossword_data import fetch_data
 
 def main():
-    print(fetch_data(5))
+   pass
+   # currently, the game is run from the game.py file
 
 
 if __name__ == "__main__":

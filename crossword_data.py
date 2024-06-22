@@ -16,7 +16,7 @@ class Data():
         self.grid = self.json_data
         self.author = self.json_data
         self.editor = self.json_data
-        self._cpyright = self.json_data
+        self.cpyright = self.json_data
         self.date = self.json_data
         self.publisher = self.json_data
         self.title = self.json_data
@@ -28,12 +28,13 @@ class Data():
     def across_clues(self, json_data):
         clues = json_data.json()["clues"]
         across_clues = clues["across"]
+        # break up clues that are too long
         temp = []
         for clue in across_clues:
             if len(clue) > 45:
                 words = clue.split(" ")
-                first_half = " ".join(words[0:len(words)//2 + 1])
-                second_half = " ".join(words[len(words)//2 +1:])
+                first_half = " ".join(words[0:len(words)*2//3 + 1])
+                second_half = " ".join(words[len(words)*2//3 +1:])
                 temp.append(first_half)
                 temp.append("      " + second_half)
             else:
@@ -47,12 +48,13 @@ class Data():
     def down_clues(self, json_data):
         clues = json_data.json()["clues"]
         down_clues = clues["down"]
+        # break up clues that are too long
         temp = []
         for clue in down_clues:
             if len(clue) > 45:
                 words = clue.split(" ")
-                first_half = " ".join(words[0:len(words)//2 + 1])
-                second_half = " ".join(words[len(words)//2 +1:])
+                first_half = " ".join(words[0:len(words)*2//3 + 1])
+                second_half = " ".join(words[len(words)*2//3 +1:])
                 temp.append(first_half)
                 temp.append("      " + second_half)
             else:
@@ -120,10 +122,10 @@ class Data():
         self._editor = json_data.json()["editor"]
 
     @property
-    def _cpyright(self):
+    def cpyright(self):
         return self.__cpyright    
-    @_cpyright.setter
-    def _cpyright(self, json_data):
+    @cpyright.setter
+    def cpyright(self, json_data):
         self.__cpyright = json_data.json()["copyright"]
 
     @property
@@ -147,6 +149,7 @@ class Data():
     def title(self, json_data):
         self._title = json_data.json()["title"]
 
+    # create a dictionary with numbers as keys and answers as values
     def craft_across_ans_dict(self):
         across_answer_dict = {}
         clues = self.json_data.json()["clues"]

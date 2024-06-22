@@ -48,6 +48,7 @@ while running:
             
     # Render clues text
     graphics.display_clues()
+    graphics.render_info()
     # highlight current word
     graphics.draw_highlights(puzzle)
 

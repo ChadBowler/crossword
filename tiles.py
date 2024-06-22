@@ -26,8 +26,3 @@ class Tile():
         self.blank = False
         # locked will remove the ability to change the value in the tile
         self.locked = False
-
-    # def _fill_tile(self, value):
-    #     if self.focus:
-    #         if not self.locked:
-    #             self.input = value

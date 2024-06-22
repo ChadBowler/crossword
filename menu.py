@@ -11,7 +11,7 @@ surface = pygame.display.set_mode((settings.screen_width, settings.screen_height
 def start_game():
     print("hello world")
 
-menu = pygame_menu.Menu('Welcome', settings.screen_width, settings.screen_height, theme=pygame_menu.themes.THEME_BLUE)
+menu = pygame_menu.Menu('Welcome', settings.screen_width, settings.screen_height)
 
 menu.add.text_input('Name :', default='John Doe')
 # menu.add.selector('Difficulty :', [('Hard', 1), ('Easy', 2)], onchange=set_difficulty)
