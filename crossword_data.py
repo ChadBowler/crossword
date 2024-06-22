@@ -27,7 +27,18 @@ class Data():
     @across_clues.setter
     def across_clues(self, json_data):
         clues = json_data.json()["clues"]
-        self._across_clues = clues["across"]
+        across_clues = clues["across"]
+        temp = []
+        for clue in across_clues:
+            if len(clue) > 45:
+                words = clue.split(" ")
+                first_half = " ".join(words[0:len(words)//2 + 1])
+                second_half = " ".join(words[len(words)//2 +1:])
+                temp.append(first_half)
+                temp.append("      " + second_half)
+            else:
+                temp.append(clue)
+        self._across_clues = temp
           
     @property
     def down_clues(self):
@@ -35,7 +46,18 @@ class Data():
     @down_clues.setter
     def down_clues(self, json_data):
         clues = json_data.json()["clues"]
-        self._down_clues = clues["down"]
+        down_clues = clues["down"]
+        temp = []
+        for clue in down_clues:
+            if len(clue) > 45:
+                words = clue.split(" ")
+                first_half = " ".join(words[0:len(words)//2 + 1])
+                second_half = " ".join(words[len(words)//2 +1:])
+                temp.append(first_half)
+                temp.append("      " + second_half)
+            else:
+                temp.append(clue)
+        self._down_clues = temp
 
     @property
     def across_answers(self):
@@ -127,20 +149,24 @@ class Data():
 
     def craft_across_ans_dict(self):
         across_answer_dict = {}
-        for i in range(len(self.across_clues)):
-            clue_key = self.across_clues[i].split(".")[0]
+        clues = self.json_data.json()["clues"]
+        across_clues = clues["across"]
+        for i in range(len(across_clues)):
+            clue_key = across_clues[i].split(".")[0]
             across_answer_dict[clue_key] = self.across_answers[i]
         return across_answer_dict
 
     def craft_down_ans_dict(self):
         down_answer_dict = {}
-        for i in range(len(self.down_clues)):
-            clue_key = self.down_clues[i].split(".")[0]
+        clues = self.json_data.json()["clues"]
+        down_clues = clues["down"]
+        for i in range(len(down_clues)):
+            clue_key = down_clues[i].split(".")[0]
             down_answer_dict[clue_key] = self.down_answers[i]
         return down_answer_dict
         
     def fetch_data(self, retries):
-        random.seed(0)
+        # random.seed(0)
         while True:
             retries -= 1
             year = str(random.randint(1988, 2018))

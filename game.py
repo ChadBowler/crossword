@@ -10,8 +10,8 @@ from keyboard_input import handle_keyboard_input
 # pygame setup
 pygame.init()
 
-settings = Settings("dark")
 puzzle_data = Data()
+settings = Settings("dark", puzzle_data)
 puzzle = Puzzle(puzzle_data, settings.margin, settings.margin*2, settings.margin)
 graphics = Graphics(settings, puzzle_data, puzzle)
 pygame.display.set_caption('Crossword Game')

@@ -5,11 +5,13 @@ import math
 pygame.init()
 
 class Settings():
-    def __init__(self, theme) -> None:
+    def __init__(self, theme, data) -> None:
+        # dimensions
         self.screen_height = pygame.display.Info().current_h * .9
-        self.screen_width = self.screen_height * 1.7
-        self.font_size = math.floor(self.screen_height * 0.0093)
-        self.margin = math.floor(self.screen_height * 0.0385)
+        self.screen_width = self.screen_height * 1.9
+        self.font_size = data
+        self.margin = data
+        #colors
         self.bg_color = theme
         self.board_color = theme
         self.text_color = theme
@@ -22,6 +24,28 @@ class Settings():
         with open(r'./settings/settings.json', 'r') as f:
             configs = json.load(f)
         return configs
+    
+    @property
+    def margin(self):
+        return self._margin
+
+    @margin.setter
+    def margin(self, data):
+        if data.cols > 15:
+            self._margin = math.floor((self.screen_height * 0.0385)* 0.8)
+        else:
+            self._margin = math.floor(self.screen_height * 0.0385)
+
+    @property
+    def font_size(self):
+        return self._font_size
+
+    @font_size.setter
+    def font_size(self, data):
+        if data.cols > 15:
+            self._font_size = math.floor((self.screen_height * 0.0093)* 0.8)
+        else:
+            self._font_size = math.floor(self.screen_height * 0.0093)
 
     @property
     def bg_color(self):

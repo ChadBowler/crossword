@@ -1,22 +1,17 @@
 import pygame
 import math
-from settings.settings import Settings
-from crossword_data import Data
-from puzzle_board import Puzzle
-
-# settings = Settings("dark")
 
 class Graphics():
     def __init__(self, settings, data, puzzle) -> None:
         self.settings = settings
         self.data = data
+        self.puzzle = puzzle
         # screen
         self.screen = pygame.display.set_mode((settings.screen_width, settings.screen_height), flags=pygame.SCALED)
         self.screen_height = self.screen.get_height()
         self.screen_width = self.screen.get_width()
         self.margin = settings.margin
         # board
-        self.puzzle = puzzle
         self.board_height = puzzle._rows * puzzle._tile_size_y
         self.board_width = puzzle._cols * puzzle._tile_size_x
         self.board = pygame.Surface.subsurface(self.screen, ((puzzle._x1, puzzle._y1), (self.board_width, self.board_height)))
@@ -27,11 +22,10 @@ class Graphics():
         self.number_font = pygame.font.Font(None, math.floor(settings.font_size * 2))
         self.type_font = pygame.font.Font(None, math.floor(settings.font_size * 3))
         # clues
-        self.clues_section = pygame.Surface.subsurface(self.screen, ((self.screen_width - self.board_width - self.margin*2, puzzle._y1), (self.board_width, self.screen_height - puzzle._y1)))
+        self.clues_section = pygame.Surface.subsurface(self.screen, ((self.board_width + self.margin*2, puzzle._y1), (self.board_width * 1.8, self.screen_height - puzzle._y1)))
         self.clues_size = math.floor(settings.font_size * 1.8)
         self.clues_font = pygame.font.Font(None, math.floor(settings.font_size * 1.8))
         self.clues_header_font = pygame.font.Font(None, math.floor(settings.font_size * 3.5))
-        
 
     def draw_grid(self, tile):
         pygame.draw.line(self.screen, self.grid_color, (tile.tl_corner.x, tile.tl_corner.y), (tile.bl_corner.x, tile.bl_corner.y), width=3)
@@ -69,16 +63,41 @@ class Graphics():
             self.draw_down_highlight(array=puzzle._find_word_down(), color=self.settings.block_highlight)
 
     def display_clues(self):
-        down_clues_header = self.clues_header_font.render("Down:", True, self.settings.text_color)
-        self.clues_section.blit(down_clues_header, (self.margin / 2, 0))
-        for i in range(len(self.data.down_clues)):
-            clue_text = self.clues_font.render(self.data.down_clues[i], True, self.settings.text_color)
-            self.clues_section.blit(clue_text, (self.margin / 2, 40 + i*self.clues_size))
-        across_clues_header = self.clues_header_font.render("Across:", True, self.settings.text_color)
-        self.clues_section.blit(across_clues_header, (self.clues_section.get_width()/2 + self.margin*2, 0))
-        for i in range(len(self.data.across_clues)):
-            clue_text = self.clues_font.render(self.data.across_clues[i], True, self.settings.text_color)
-            self.clues_section.blit(clue_text, (self.clues_section.get_width()/2 + self.margin*2, 40 + i*self.clues_size))
+        if len(self.data.down_clues) > 70 or len(self.data.across_clues) > 70:
+            down_clues_header = self.clues_header_font.render("Down:", True, self.settings.text_color)
+            self.clues_section.blit(down_clues_header, (self.margin // 2, 0))
+
+            for i in range(len(self.data.down_clues)//2):
+                clue_text = self.clues_font.render(self.data.down_clues[i], True, self.settings.text_color)
+                self.clues_section.blit(clue_text, (self.margin // 2, 40 + i*self.clues_size))
+            for i in range(len(self.data.down_clues)//2, len(self.data.down_clues)):
+                clue_text = self.clues_font.render(self.data.down_clues[i], True, self.settings.text_color)
+                self.clues_section.blit(clue_text, (self.clues_section.get_width()//4 + self.margin*2, 40 + (i - len(self.data.down_clues)//2)*self.clues_size))
+
+            across_clues_header = self.clues_header_font.render("Across:", True, self.settings.text_color)
+            self.clues_section.blit(across_clues_header, (self.clues_section.get_width()//2 + self.margin*3, 0))
+
+            for i in range(len(self.data.across_clues)//2):
+                clue_text = self.clues_font.render(self.data.across_clues[i], True, self.settings.text_color)
+                self.clues_section.blit(clue_text, (self.clues_section.get_width()//2 + self.margin*3, 40 + i*self.clues_size))
+            for i in range(len(self.data.across_clues)//2, len(self.data.across_clues)):
+                clue_text = self.clues_font.render(self.data.across_clues[i], True, self.settings.text_color)
+                self.clues_section.blit(clue_text, (self.clues_section.get_width()//4*3 + self.margin*4, 40 + (i - len(self.data.across_clues)//2)*self.clues_size))
+
+        else:
+            down_clues_header = self.clues_header_font.render("Down:", True, self.settings.text_color)
+            self.clues_section.blit(down_clues_header, (self.margin // 2, 0))
+
+            for i in range(len(self.data.down_clues)):
+                clue_text = self.clues_font.render(self.data.down_clues[i], True, self.settings.text_color)
+                self.clues_section.blit(clue_text, (self.margin // 2, 40 + i*self.clues_size))
+
+            across_clues_header = self.clues_header_font.render("Across:", True, self.settings.text_color)
+            self.clues_section.blit(across_clues_header, (self.clues_section.get_width()//2 + self.margin*2, 0))
+
+            for i in range(len(self.data.across_clues)):
+                clue_text = self.clues_font.render(self.data.across_clues[i], True, self.settings.text_color)
+                self.clues_section.blit(clue_text, (self.clues_section.get_width()//2 + self.margin*2, 40 + i*self.clues_size))
 
     def fill_tiles(self, tile):
         # set tile background as a subsurface of board
